@@ -39,7 +39,6 @@ def MoveMonsters(matrizMonsters, janela, direcao, nivel_dificuldade, etapa_menu)
                 if (matrizMonsters[l][c].x < 0) or (matrizMonsters[l][c].x + matrizMonsters[l][c].width > janela.width):
                     mudarDirecao = True
                 if matrizMonsters[l][c].y > janela.height:
-                    etapa_menu = 1
                     acabou = True
     if mudarDirecao == True:
         fileiraMonstros = len(matrizMonsters)
@@ -88,7 +87,7 @@ sair.y = ranking.y + 100 + ranking.height/2 - sair.height/2
 etapa_menu = 1
 nivel_dificuldade = 1
 vel_player = 400
-atirou = False
+atirou_player = False
 timerPontuacao = 0
 pontuacaoMostrar = "0"
 rank = []
@@ -113,9 +112,6 @@ while True:
         dificuldade.y = jogar.y + 100 + jogar.height/2 - dificuldade.height/2
         ranking.y = dificuldade.y + 100 + dificuldade.height/2 - ranking.height/2
         sair.y = ranking.y + 100 + ranking.height/2 - sair.height/2
-        if acabou == True:
-            rank.append(pontuacaoReal)
-            acabou = False
 
         if mouse.is_over_area((jogar.x, jogar.y),(jogar.x + jogar.width, jogar.y + jogar.height)):
             jogar = Sprite("botao_jogar_HOVER.jpg", 1)
@@ -148,13 +144,17 @@ while True:
         player.y = janela.height - 50
         player.x = janela.width/2 - player.width/2
         etapa_menu = 3
-        projeteis = []
-        matrizMonsters, quantidadeMonstro = SpawnMonsters(janela, nivel_dificuldade)
+        projeteis_player = []
+        projeteis_bot = []
+        matrizMonsters, quantidadeMonstro = SpawnMonsters(janela)
         direcao = 1
         pontuacaoReal = 0
         pontosBot = 100*nivel_dificuldade
         timerFinish = 0
         pontuacaoMostrar = "0"
+        timerBotTiro = 0
+        vidas_player = 3
+        acertado = False
     
     if etapa_menu == 3:
         if teclado.key_pressed("LEFT"):
@@ -165,21 +165,21 @@ while True:
             player.x = janela.width - player.width
         elif player.x + player.width/2 > janela.width:
             player.x = 2
-        if (teclado.key_pressed("SPACE")) and (atirou == False):
-            tempo_tiro = 0
-            tiro = Sprite("tiro.png", 1)
-            tiro.y = player.y
-            tiro.x = player.x + player.width/2
-            tiro_auxiliar = tiro
-            projeteis.append(tiro_auxiliar)
-            atirou = True
-        if atirou == True:
-            tempo_tiro += janela.delta_time()
-            if tempo_tiro > 0.4:
-                atirou = False
-        if quantidadeMonstro <= 0:
+        if (teclado.key_pressed("SPACE")) and (atirou_player == False):
+            tempo_tiro_player = 0
+            tiro_player = Sprite("tiro_player.png", 1)
+            tiro_player.y = player.y
+            tiro_player.x = player.x + player.width/2
+            tiro_auxiliar = tiro_player
+            projeteis_player.append(tiro_auxiliar)
+            atirou_player = True
+        if atirou_player == True:
+            tempo_tiro_player += janela.delta_time()
+            if tempo_tiro_player > 0.4:
+                atirou_player = False
+        if (quantidadeMonstro <= 0) or (vidas_player == 0) or (acabou == True):
             timerFinish += janela.delta_time()
-            if timerFinish >= 3:
+            if timerFinish >= 1.5:
                 etapa_menu = 1
                 rank.append(pontuacaoReal)
         timerPontuacao += janela.delta_time()
@@ -188,6 +188,22 @@ while True:
                 pontosBot -= 1
             timerPontuacao = 0
             pontuacaoMostrar = str(int(pontuacaoReal))
+        timerBotTiro += janela.delta_time()
+        if timerBotTiro >= 0.8/nivel_dificuldade:
+            tiro_bot = Sprite("tiro_bot.png", 1)
+            fileiraMonstros = len(matrizMonsters)
+            fileiraRandom = randint(0, fileiraMonstros)
+            for l in range(0, fileiraMonstros, +1):
+                colunaMonstros = len(matrizMonsters[l])
+                if l == fileiraRandom:
+                    colunaRandom = randint(0, colunaMonstros)
+                    for c in range(0, colunaMonstros, +1):
+                        if c == colunaRandom:
+                            tiro_bot.y = matrizMonsters[l][c].y + matrizMonsters[l][c].height
+                            tiro_bot.x = matrizMonsters[l][c].x + matrizMonsters[l][c].width/2
+                            tiro_auxiliar = tiro_bot
+                            projeteis_bot.append(tiro_auxiliar)
+            timerBotTiro = 0
 
     #Opções de Dificuldade
     if etapa_menu == 4:
@@ -232,28 +248,57 @@ while True:
         sair.draw()
         janela.draw_text("Sua última pontuação: " + pontuacaoMostrar, 40, janela.height - 40, 20, (255, 0, 0), "Arial", True, False)
     if etapa_menu == 3:
-        janela.draw_text(pontuacaoMostrar, janela.width/2 - 20, janela.height/3 - 20, 40, (255, 0, 0), "Arial", True, False)
-        player.draw()
-        for t in range(len(projeteis)-1, 0, -1):
-            projeteis[t].draw()
-            projeteis[t].y = projeteis[t].y - 300*janela.delta_time()
+        janela.draw_text("Vidas: " + str(vidas_player), 10, janela.height - 70, 30, (255, 0, 0), "Arial", True, False)
+        janela.draw_text("Pontuação: " + pontuacaoMostrar, 10, janela.height - 40, 30, (255, 0, 0), "Arial", True, False)
+        if acertado == False:
+            player.draw()
+        elif acertado == True:
+            timerAcertado += janela.delta_time()
+            timerInvisivel += janela.delta_time()
+            if invisivel == False:
+                player.draw()
+                timerInvisivel += janela.delta_time()
+                if timerInvisivel > 0.5:
+                    invisivel = True
+            elif invisivel == True:
+                timerInvisivel += janela.delta_time()
+                if timerInvisivel > 0.5:
+                    invisivel = False
+            if timerAcertado > 2:
+                acertado = False
+        for t in range(len(projeteis_player)-1, 0, -1):
+            projeteis_player[t].draw()
+            projeteis_player[t].y -= 300*janela.delta_time()
             fileiraMonstros = len(matrizMonsters)
-            tirarTiro = False
+            tirarTiro_player = False
             for l in range(0, fileiraMonstros, +1):
                     colunaMonstros = len(matrizMonsters[l])
                     for c in range(0, colunaMonstros, +1):
-                        if projeteis[t].collided(matrizMonsters[l][c]):
-                            tirarTiro = True
+                        if projeteis_player[t].collided(matrizMonsters[l][c]):
+                            tirarTiro_player = True
                             matrizMonsters[l].remove(matrizMonsters[l][c])
                             pontuacaoReal += pontosBot
                             quantidadeMonstro -= 1
                             break
                     if len(matrizMonsters[l]) == 0:
                         matrizMonsters.remove(matrizMonsters[l])
-            if projeteis[t].y < 0:
-                tirarTiro = True
-            if tirarTiro == True:
-                projeteis.remove(projeteis[t])
+            if projeteis_player[t].y < 0:
+                tirarTiro_player = True
+            if tirarTiro_player == True:
+                projeteis_player.remove(projeteis_player[t])
+        for t in range(len(projeteis_bot)-1, 0, -1):
+            projeteis_bot[t].draw()
+            projeteis_bot[t].y += 200*janela.delta_time()
+            if projeteis_bot[t].y > janela.height:
+                projeteis_bot.remove(projeteis_bot[t])
+            elif (projeteis_bot[t].collided(player)) and (vidas_player > 0) and (acertado == False):
+                projeteis_bot.remove(projeteis_bot[t])
+                vidas_player -= 1
+                player.x = janela.width/2 - player.width/2
+                timerAcertado = 0
+                timerInvisivel = 0
+                acertado = True
+                invisivel = True
         DrawMonsters(matrizMonsters)
         matrizMonsters, direcao, etapa_menu, acabou = MoveMonsters(matrizMonsters, janela, direcao, nivel_dificuldade, etapa_menu)
     if etapa_menu == 4:
