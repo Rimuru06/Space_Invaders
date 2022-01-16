@@ -1,10 +1,11 @@
 from PPlay.window import *
 from PPlay.gameimage import *
 from PPlay.sprite import *
+from random import randint
 
 #Functions
 
-def SpawnMonsters(janela, nivel_dificuldade):
+def SpawnMonsters(janela):
     monstros = 20
     monstro = Sprite("bot.png", 1)
     MatrizMonsters = []
@@ -29,7 +30,7 @@ def SpawnMonsters(janela, nivel_dificuldade):
 def MoveMonsters(matrizMonsters, janela, direcao, nivel_dificuldade, etapa_menu):
     fileiraMonstros = len(matrizMonsters)
     mudarDirecao = False
-    velocidadeMonstros = 30*janela.delta_time()*direcao*nivel_dificuldade
+    velocidadeMonstros = 40*janela.delta_time()*direcao*(nivel_dificuldade**(1/2))
     acabou = False
     for l in range(0, fileiraMonstros, +1):
             colunaMonstros = len(matrizMonsters[l])
