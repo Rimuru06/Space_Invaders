@@ -27,10 +27,10 @@ def SpawnMonsters(janela):
         latitudeMonster += 40*3/2
     return MatrizMonsters, quantidadeMonstro
 
-def MoveMonsters(matrizMonsters, janela, direcao, nivel_dificuldade, etapa_menu):
+def MoveMonsters(matrizMonsters, janela, direcao, nivel_dificuldade, etapa_menu, onda):
     fileiraMonstros = len(matrizMonsters)
     mudarDirecao = False
-    velocidadeMonstros = 40*janela.delta_time()*direcao*(nivel_dificuldade**(1/2))
+    velocidadeMonstros = 20*janela.delta_time()*direcao*(nivel_dificuldade**(1/2))*onda
     acabou = False
     for l in range(0, fileiraMonstros, +1):
             colunaMonstros = len(matrizMonsters[l])
@@ -149,12 +149,13 @@ while True:
         matrizMonsters, quantidadeMonstro = SpawnMonsters(janela)
         direcao = 1
         pontuacaoReal = 0
-        pontosBot = 100*nivel_dificuldade
+        pontosBot = 50*nivel_dificuldade
         timerFinish = 0
         pontuacaoMostrar = "0"
         timerBotTiro = 0
         vidas_player = 3
         acertado = False
+        onda = 1
     
     if etapa_menu == 3:
         if teclado.key_pressed("LEFT"):
@@ -180,10 +181,18 @@ while True:
         if (quantidadeMonstro <= 0) or (vidas_player == 0) or (acabou == True):
             timerFinish += janela.delta_time()
             if timerFinish >= 1.5:
-                etapa_menu = 1
-                rank.append(pontuacaoReal)
+                if vidas_player > 0:
+                    projeteis_bot = []
+                    projeteis_player = []
+                    matrizMonsters, quantidadeMonstro = SpawnMonsters(janela)
+                    pontosBot = 100*nivel_dificuldade
+                    acabou = False
+                    timerFinish = 0
+                elif vidas_player <= 0:
+                    etapa_menu = 1
+                    rank.append(pontuacaoReal)
         timerPontuacao += janela.delta_time()
-        if timerPontuacao >= 1:
+        if timerPontuacao >= 2.5:
             if pontosBot > 1:
                 pontosBot -= 1
             timerPontuacao = 0
@@ -193,11 +202,11 @@ while True:
             tiro_bot = Sprite("tiro_bot.png", 1)
             fileiraMonstros = len(matrizMonsters)
             fileiraRandom = randint(0, fileiraMonstros)
-            for l in range(0, fileiraMonstros, +1):
+            for l in range(fileiraMonstros, -1, +1):
                 colunaMonstros = len(matrizMonsters[l])
                 if l == fileiraRandom:
                     colunaRandom = randint(0, colunaMonstros)
-                    for c in range(0, colunaMonstros, +1):
+                    for c in range(colunaMonstros, -1, -1):
                         if c == colunaRandom:
                             tiro_bot.y = matrizMonsters[l][c].y + matrizMonsters[l][c].height
                             tiro_bot.x = matrizMonsters[l][c].x + matrizMonsters[l][c].width/2
@@ -266,14 +275,14 @@ while True:
                     invisivel = False
             if timerAcertado > 2:
                 acertado = False
-        for t in range(len(projeteis_player)-1, 0, -1):
+        for t in range(len(projeteis_player)-1, -1, -1):
             projeteis_player[t].draw()
             projeteis_player[t].y -= 300*janela.delta_time()
             fileiraMonstros = len(matrizMonsters)
             tirarTiro_player = False
-            for l in range(0, fileiraMonstros, +1):
+            for l in range(fileiraMonstros-1, -1, -1):
                     colunaMonstros = len(matrizMonsters[l])
-                    for c in range(0, colunaMonstros, +1):
+                    for c in range(colunaMonstros-1, -1, -1):
                         if projeteis_player[t].collided(matrizMonsters[l][c]):
                             tirarTiro_player = True
                             matrizMonsters[l].remove(matrizMonsters[l][c])
@@ -282,13 +291,14 @@ while True:
                             break
                     if len(matrizMonsters[l]) == 0:
                         matrizMonsters.remove(matrizMonsters[l])
+                        onda += 0.1
             if projeteis_player[t].y < 0:
                 tirarTiro_player = True
             if tirarTiro_player == True:
                 projeteis_player.remove(projeteis_player[t])
-        for t in range(len(projeteis_bot)-1, 0, -1):
+        for t in range(len(projeteis_bot)-1, -1, -1):
             projeteis_bot[t].draw()
-            projeteis_bot[t].y += 200*janela.delta_time()
+            projeteis_bot[t].y += 150*janela.delta_time()*onda
             if projeteis_bot[t].y > janela.height:
                 projeteis_bot.remove(projeteis_bot[t])
             elif (projeteis_bot[t].collided(player)) and (vidas_player > 0) and (acertado == False):
@@ -300,7 +310,7 @@ while True:
                 acertado = True
                 invisivel = True
         DrawMonsters(matrizMonsters)
-        matrizMonsters, direcao, etapa_menu, acabou = MoveMonsters(matrizMonsters, janela, direcao, nivel_dificuldade, etapa_menu)
+        matrizMonsters, direcao, etapa_menu, acabou = MoveMonsters(matrizMonsters, janela, direcao, nivel_dificuldade, etapa_menu, onda)
     if etapa_menu == 4:
         facil.draw()
         medio.draw()
