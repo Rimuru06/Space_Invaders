@@ -188,7 +188,7 @@ while True:
                     pontosBot = 100*nivel_dificuldade
                     acabou = False
                     timerFinish = 0
-                elif vidas_player <= 0:
+                elif (vidas_player == 0) or (acabou == True):
                     etapa_menu = 1
                     rank.append(pontuacaoReal)
         timerPontuacao += janela.delta_time()
@@ -198,15 +198,15 @@ while True:
             timerPontuacao = 0
             pontuacaoMostrar = str(int(pontuacaoReal))
         timerBotTiro += janela.delta_time()
-        if timerBotTiro >= 0.8/nivel_dificuldade:
+        if timerBotTiro >= 1/nivel_dificuldade:
             tiro_bot = Sprite("tiro_bot.png", 1)
             fileiraMonstros = len(matrizMonsters)
             fileiraRandom = randint(0, fileiraMonstros)
-            for l in range(fileiraMonstros, -1, +1):
+            for l in range(fileiraMonstros-1, -1, -1):
                 colunaMonstros = len(matrizMonsters[l])
                 if l == fileiraRandom:
                     colunaRandom = randint(0, colunaMonstros)
-                    for c in range(colunaMonstros, -1, -1):
+                    for c in range(colunaMonstros-1, -1, -1):
                         if c == colunaRandom:
                             tiro_bot.y = matrizMonsters[l][c].y + matrizMonsters[l][c].height
                             tiro_bot.x = matrizMonsters[l][c].x + matrizMonsters[l][c].width/2
