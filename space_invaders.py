@@ -90,8 +90,6 @@ vel_player = 400
 atirou_player = False
 timerPontuacao = 0
 pontuacaoMostrar = "0"
-rank = []
-sortedRank = []
 acabou = False
 
 while True:
@@ -151,36 +149,41 @@ while True:
         pontuacaoReal = 0
         pontosBot = 50*nivel_dificuldade
         timerFinish = 0
+        timerName = 0
         pontuacaoMostrar = "0"
         timerBotTiro = 0
         vidas_player = 3
         acertado = False
         onda = 1
+        nomePlayer = ""
     
     if etapa_menu == 3:
-        if teclado.key_pressed("LEFT"):
-            player.x = player.x - vel_player*janela.delta_time()
-        elif teclado.key_pressed("RIGHT"):
-            player.x = player.x + vel_player*janela.delta_time()
-        if player.x + player.width/2 < 0:
-            player.x = janela.width - player.width
-        elif player.x + player.width/2 > janela.width:
-            player.x = 2
-        if (teclado.key_pressed("SPACE")) and (atirou_player == False):
-            tempo_tiro_player = 0
-            tiro_player = Sprite("tiro_player.png", 1)
-            tiro_player.y = player.y
-            tiro_player.x = player.x + player.width/2
-            tiro_auxiliar = tiro_player
-            projeteis_player.append(tiro_auxiliar)
-            atirou_player = True
-        if atirou_player == True:
-            tempo_tiro_player += janela.delta_time()
-            if tempo_tiro_player > 0.4:
-                atirou_player = False
+        if not ((vidas_player == 0) or (acabou == True)):
+            if teclado.key_pressed("LEFT"):
+                player.x = player.x - vel_player*janela.delta_time()
+            elif teclado.key_pressed("RIGHT"):
+                player.x = player.x + vel_player*janela.delta_time()
+            if player.x + player.width/2 < 0:
+                player.x = janela.width - player.width
+            elif player.x + player.width/2 > janela.width:
+                player.x = 2
+            if (teclado.key_pressed("SPACE")) and (atirou_player == False):
+                tempo_tiro_player = 0
+                tiro_player = Sprite("tiro_player.png", 1)
+                tiro_player.y = player.y
+                tiro_player.x = player.x + player.width/2
+                tiro_auxiliar = tiro_player
+                projeteis_player.append(tiro_auxiliar)
+                atirou_player = True
+            if atirou_player == True:
+                tempo_tiro_player += janela.delta_time()
+                if tempo_tiro_player > 0.4:
+                    atirou_player = False
+            timerName = 0
         if (quantidadeMonstro <= 0) or (vidas_player == 0) or (acabou == True):
             timerFinish += janela.delta_time()
-            if timerFinish >= 1.5:
+            timerName += janela.delta_time()
+            if timerFinish >= 2:
                 if vidas_player > 0:
                     projeteis_bot = []
                     projeteis_player = []
@@ -188,9 +191,102 @@ while True:
                     pontosBot = 100*nivel_dificuldade
                     acabou = False
                     timerFinish = 0
-                elif (vidas_player == 0) or (acabou == True):
-                    etapa_menu = 1
-                    rank.append(pontuacaoReal)
+                elif ((vidas_player == 0) or (acabou == True)) and (timerName > 0.2):
+                    if teclado.key_pressed("ENTER"):
+                        etapa_menu = 1
+                        acabou = False
+                        vidas_player = -1
+                        nomePlayer = nomePlayer + ": " + str(int(pontuacaoReal))
+                        rank = open('pontuacao.txt', 'r+')
+                        linhas = rank.readlines()
+                        numeroLinhas = len(linhas)
+                        if numeroLinhas >= 5:
+                            rank.seek(0)
+                            rank.truncate()
+                            for numero, linha in enumerate(linhas):
+                                if numero not in [0, 0]:
+                                    rank.write(linha)
+                        rank.write('\n' + nomePlayer)
+                        rank.close()
+                        timerName = 0
+                    elif teclado.key_pressed("a"):
+                        nomePlayer += "a"
+                        timerName = 0
+                    elif teclado.key_pressed("b"):
+                        nomePlayer += "b"
+                        timerName = 0
+                    elif teclado.key_pressed("c"):
+                        nomePlayer += "c"
+                        timerName = 0
+                    elif teclado.key_pressed("d"):
+                        nomePlayer += "d"
+                        timerName = 0
+                    elif teclado.key_pressed("e"):
+                        nomePlayer += "e"
+                        timerName = 0
+                    elif teclado.key_pressed("f"):
+                        nomePlayer += "f"
+                        timerName = 0
+                    elif teclado.key_pressed("g"):
+                        nomePlayer += "g"
+                        timerName = 0
+                    elif teclado.key_pressed("h"):
+                        nomePlayer += "h"
+                        timerName = 0
+                    elif teclado.key_pressed("i"):
+                        nomePlayer += "i"
+                        timerName = 0
+                    elif teclado.key_pressed("j"):
+                        nomePlayer += "j"
+                        timerName = 0
+                    elif teclado.key_pressed("k"):
+                        nomePlayer += "k"
+                        timerName = 0
+                    elif teclado.key_pressed("l"):
+                        nomePlayer += "l"
+                        timerName = 0
+                    elif teclado.key_pressed("m"):
+                        nomePlayer += "m"
+                        timerName = 0
+                    elif teclado.key_pressed("n"):
+                        nomePlayer += "n"
+                        timerName = 0
+                    elif teclado.key_pressed("o"):
+                        nomePlayer += "o"
+                        timerName = 0
+                    elif teclado.key_pressed("p"):
+                        nomePlayer += "p"
+                        timerName = 0
+                    elif teclado.key_pressed("q"):
+                        nomePlayer += "q"
+                        timerName = 0
+                    elif teclado.key_pressed("r"):
+                        nomePlayer += "r"
+                        timerName = 0
+                    elif teclado.key_pressed("s"):
+                        nomePlayer += "s"
+                        timerName = 0
+                    elif teclado.key_pressed("t"):
+                        nomePlayer += "t"
+                        timerName = 0
+                    elif teclado.key_pressed("u"):
+                        nomePlayer += "u"
+                        timerName = 0
+                    elif teclado.key_pressed("v"):
+                        nomePlayer += "v"
+                        timerName = 0
+                    elif teclado.key_pressed("w"):
+                        nomePlayer += "w"
+                        timerName = 0
+                    elif teclado.key_pressed("x"):
+                        nomePlayer += "x"
+                        timerName = 0
+                    elif teclado.key_pressed("y"):
+                        nomePlayer += "y"
+                        timerName = 0
+                    elif teclado.key_pressed("z"):
+                        nomePlayer += "z"
+                        timerName = 0
         timerPontuacao += janela.delta_time()
         if timerPontuacao >= 2.5:
             if pontosBot > 1:
@@ -310,16 +406,23 @@ while True:
                 acertado = True
                 invisivel = True
         DrawMonsters(matrizMonsters)
-        matrizMonsters, direcao, etapa_menu, acabou = MoveMonsters(matrizMonsters, janela, direcao, nivel_dificuldade, etapa_menu, onda)
+        if not ((vidas_player == 0) or (acabou == True)):
+            matrizMonsters, direcao, etapa_menu, acabou = MoveMonsters(matrizMonsters, janela, direcao, nivel_dificuldade, etapa_menu, onda)
+        if (vidas_player == 0) or (acabou == True):
+            janela.draw_text("Digite seu nome", janela.width/4, janela.height/4, 80, (255, 0, 0), "Arial", True, False)
+            janela.draw_text(nomePlayer, janela.width/3, janela.height/4 + 100, 80, (255, 0, 0), "Arial", True, False)
     if etapa_menu == 4:
         facil.draw()
         medio.draw()
         dificil.draw()
     if etapa_menu == 5:
-        rank.sort(reverse=True)
-        y = 150
+        #MEXER AQUI DEPOI
+        y = 500
         janela.draw_text("OS TOPZERA", janela.width/2 - 200, 60, 60, (255, 0, 0), "Arial", True, False)
-        for i in range(0, len(rank), +1):
-            janela.draw_text(str(int(rank[i])), janela.width/2 - 60, y, 40, (255, 0, 0), "Arial", False, False)
-            y += 80
+        rank = open("pontuacao.txt", "r")
+        linhas = rank.readlines()
+        for l in linhas:
+            janela.draw_text(l.strip(), janela.width/3 - 100, y, 40, (255, 0, 0), "Arial", False, False)
+            y -= 80
+        rank.close()
     janela.update()

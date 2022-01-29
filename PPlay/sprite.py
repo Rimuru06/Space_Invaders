@@ -26,7 +26,7 @@ class Sprite(animation.Animation):
         if(window.Window.get_keyboard().key_pressed("left")):
             self.set_position(self.x - speed, self.y)
             
-        if(window.Window.get_keyboard().key_pressed("right")):
+        if(window.Window.get_board().key_pressed("right")):
             self.set_position(self.x + speed, self.y)
 
     """Permite a movimentação com o telado no eixo Y"""
